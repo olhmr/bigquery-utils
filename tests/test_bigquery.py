@@ -15,15 +15,43 @@ def test_class_creation():
     assert all(method in dir(bq) for method in ["_get_client", "archive"])
 
 
-def test_archive():
-    bq.client.create_dataset = MagicMock()
-    bq.client.copy_table = MagicMock()
+bq.client.create_dataset = MagicMock()
+bq.client.copy_table = MagicMock()
+bq.client.delete_table = MagicMock()
+
+
+def test_archive_happy_path():
     bq.client.copy_table.return_value.done = True
     bq.client.copy_table.return_value.errors = False
-    bq.client.delete_table = MagicMock()
-
     bq.archive(target=MagicMock(), destination=MagicMock())
 
     assert bq.client.create_dataset.called
     assert bq.client.copy_table.called
     assert bq.client.delete_table.called
+
+
+def test_archive_error_in_copy():
+    bq.client.copy_table.return_value.done = True
+    bq.client.copy_table.return_value.errors = True
+    bq.archive(target=MagicMock(), destination=MagicMock())
+
+    assert bq.client.create_dataset.called
+    assert bq.client.copy_table.called
+
+
+def test_archive_copy_never_finishes():
+    bq.client.copy_table.return_value.done = False
+    bq.client.copy_table.return_value.errors = False
+    bq.archive(target=MagicMock(), destination=MagicMock())
+
+    assert bq.client.create_dataset.called
+    assert bq.client.copy_table.called
+
+
+def test_archive_copy_never_finishes_but_error():
+    bq.client.copy_table.return_value.done = False
+    bq.client.copy_table.return_value.errors = True
+    bq.archive(target=MagicMock(), destination=MagicMock())
+
+    assert bq.client.create_dataset.called
+    assert bq.client.copy_table.called
