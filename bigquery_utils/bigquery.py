@@ -31,7 +31,8 @@ class BigQueryClient:
 
         If dataset creation or target copy fails, the target will not be
         deleted. However, the process it not atomic; if a dataset has been
-        created, or a table or view copied, they will remain in BigQuery.
+        created, or a table or view copied, they will not be deleted if a
+        later stage fails.
 
         This should be updated to take advantage of BigQuery's multi-statement
         transactions as documented here:
