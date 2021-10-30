@@ -5,15 +5,21 @@ import logging
 
 
 class BigQueryClient:
-    def __init__(self, defaults: dict = DEFAULT_BIGQUERY_CONFIG):
-        logging.debug("Initialising BigQuery client")
-        self.client = bigquery.Client(
-            project=defaults.get("project"),
-            credentials=defaults.get("credentials"),
-            location=defaults.get("location"),
-            default_query_job_config=defaults.get("query_job_config"),
-        )
-        logging.debug("BigQuery client initalised successfully")
+    def __init__(self):
+        self.client = None
+
+    def _get_client(self, defaults: dict = DEFAULT_BIGQUERY_CONFIG):
+        if self.client is not None:
+            return self.client
+        else:
+            logging.debug("Initialising BigQuery client")
+            self.client = bigquery.Client(
+                project=defaults.get("project"),
+                credentials=defaults.get("credentials"),
+                location=defaults.get("location"),
+                default_query_job_config=defaults.get("query_job_config"),
+            )
+            logging.debug("BigQuery client initalised successfully")
 
     def archive(
         self,
@@ -71,7 +77,7 @@ class BigQueryClient:
         job = self.client.copy_table(
             target,
             bigquery.TableReference(destination, target.table_id),
-            location=location if location else self.location,
+            location=location if location else None,
             job_config=job_config,
         )
 
