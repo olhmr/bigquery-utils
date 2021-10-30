@@ -8,7 +8,7 @@ bq = bigquery_client.BigQueryClient()
 bq.client = MagicMock()
 
 
-def test_client_creation():
+def test_class_creation():
     assert type(bq) == bigquery_client.BigQueryClient
 
     # Check list of implemented methods
