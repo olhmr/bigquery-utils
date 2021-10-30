@@ -16,7 +16,6 @@ def test_client_creation():
 
 
 def test_archive():
-    # bq.client.create_dataset = MagicMock(return_value=3)
     bq.client.create_dataset = MagicMock()
     bq.client.copy_table = MagicMock()
     bq.client.copy_table.return_value.done = True
