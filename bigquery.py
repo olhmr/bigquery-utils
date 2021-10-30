@@ -1,0 +1,71 @@
+from config import DEFAULT_LOCATION
+from google.cloud import bigquery
+from google.cloud import exceptions
+import logging
+
+
+class BigQueryClient:
+    def __init__(self, location: str = DEFAULT_LOCATION):
+        # TODO: look into sensible options for client, probably to be set in
+        # the config file
+        self.client = bigquery.Client()
+        self.location = location
+
+    def archive(
+        self,
+        target: bigquery.TableReference,
+        destination: bigquery.DatasetReference,
+        location: str = None,
+        override: bool = False,
+    ):
+        """
+        Archive a table or view
+
+        Creates an archive dataset if one does not already exist
+        Copies the target to the archive dataset
+        Deletes the target
+
+        If dataset creation or target copy fails, the target will not be
+        deleted. However, the process it not atomic; if a dataset has been
+        created, or a table or view copied, they will remain in BigQuery.
+
+        Parameters
+        ----------
+        target: bigquery.TableReference
+            the table or view to be archived
+        destination: bigquery.DatasetReference
+            the dataset in which to store the archived table or view
+        location: str, optional
+            where to run the job
+            default: picked up from config
+        override: bool, optional
+            should existing tables and views in the destination be overridden
+            default: False
+        """
+
+        # TODO: make this entire thing a single transaction
+        # make archive dataset if not exists
+        try:
+            logging.debug(f"Attempting to create archive dataset {destination}")
+            self.client.create_dataset(destination)
+            logging.debug(f"Successfully created archive dataset {destination}")
+        except exceptions.Conflict:
+            logging.debug(f"Dataset {destination} already exists")
+
+        # copy table reference
+        logging.debug("Creating copy job")
+        job_config = bigquery.CopyJobConfig(
+            write_disposition="WRITE_TRUNCATE" if override else "WRITE_EMPTY"
+        )
+        job = self.client.copy_table(
+            target,
+            bigquery.TableReference(destination, target.table_id),
+            location=location if location else self.location,
+            job_config=job_config,
+        )
+
+        if job.done and not job.errors:
+            logging.debug(f"Copy completed, deleting {target}")
+            self.client.delete_table(target)
+        else:
+            logging.debug(f"Errors in copy: {job.errors}")
