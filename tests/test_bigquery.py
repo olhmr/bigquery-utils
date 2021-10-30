@@ -1,4 +1,3 @@
-import pytest
 from google.cloud import bigquery
 from bigquery_utils import bigquery_client
 from unittest.mock import MagicMock
