@@ -26,7 +26,7 @@ class BigQueryClient:
         target: bigquery.TableReference,
         destination: bigquery.DatasetReference,
         location: str = None,
-        override: bool = False,
+        overwrite: bool = False,
     ):
         """
         Archive a table or view
@@ -54,7 +54,7 @@ class BigQueryClient:
         location: str, optional
             where to run the job
             default: picked up from config
-        override: bool, optional
+        overwrite: bool, optional
             should existing tables and views in the destination be overridden
             default: False
         """
@@ -75,7 +75,7 @@ class BigQueryClient:
         # copy table reference
         logging.debug("Creating copy job")
         job_config = bigquery.CopyJobConfig(
-            write_disposition="WRITE_TRUNCATE" if override else "WRITE_EMPTY"
+            write_disposition="WRITE_TRUNCATE" if overwrite else "WRITE_EMPTY"
         )
         job = self.client.copy_table(
             target,
