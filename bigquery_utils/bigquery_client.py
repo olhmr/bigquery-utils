@@ -61,6 +61,9 @@ class BigQueryClient:
 
         logging.debug("Running BigQuery archive function")
 
+        # ensure client is created
+        self._create_client()
+
         # create archive dataset
         try:
             logging.debug(f"Attempting to create archive dataset {destination}")
