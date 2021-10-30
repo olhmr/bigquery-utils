@@ -1,4 +1,4 @@
-from config import DEFAULT_BIGQUERY_CONFIG
+from bigquery_utils.config import DEFAULT_BIGQUERY_CONFIG
 from google.cloud import bigquery
 from google.cloud import exceptions
 import logging
