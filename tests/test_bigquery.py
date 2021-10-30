@@ -1,6 +1,6 @@
 from google.cloud import bigquery
 from bigquery_utils import bigquery_client
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, PropertyMock
 
 bigquery.TableReference = MagicMock()
 bigquery.DatasetReference = MagicMock()
@@ -19,6 +19,8 @@ def test_archive():
     # bq.client.create_dataset = MagicMock(return_value=3)
     bq.client.create_dataset = MagicMock()
     bq.client.copy_table = MagicMock()
+    bq.client.copy_table.return_value.done = True
+    bq.client.copy_table.return_value.errors = False
     bq.client.delete_table = MagicMock()
 
     bq.archive(target=MagicMock(), destination=MagicMock())
