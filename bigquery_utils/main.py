@@ -9,6 +9,9 @@ import logging
 # TODO: add generic validation function for project, dataset, and table ids
 # TODO: add confirmation dialogue
 # TODO: add exception handling
+# TODO: move utility functions to separate file
+# TODO: add tests
+# TODO: add logging
 
 
 def standardise_bigquery_ref(ref: str) -> str:
