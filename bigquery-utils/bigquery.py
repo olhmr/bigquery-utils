@@ -1,15 +1,19 @@
-from config import DEFAULT_LOCATION
+from config import DEFAULT_BIGQUERY_CONFIG
 from google.cloud import bigquery
 from google.cloud import exceptions
 import logging
 
 
 class BigQueryClient:
-    def __init__(self, location: str = DEFAULT_LOCATION):
-        # TODO: look into sensible options for client, probably to be set in
-        # the config file
-        self.client = bigquery.Client()
-        self.location = location
+    def __init__(self, defaults: dict = DEFAULT_BIGQUERY_CONFIG):
+        logging.debug("Initialising BigQuery client")
+        self.client = bigquery.Client(
+            project=defaults.get("project"),
+            credentials=defaults.get("credentials"),
+            location=defaults.get("location"),
+            default_query_job_config=defaults.get("query_job_config"),
+        )
+        logging.debug("BigQuery client initalised successfully")
 
     def archive(
         self,
