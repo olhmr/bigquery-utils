@@ -8,10 +8,10 @@ class BigQueryClient:
     def __init__(self):
         self.client = None
 
-    def _get_client(self, defaults: dict = DEFAULT_BIGQUERY_CONFIG):
-        if self.client is not None:
-            return self.client
-        else:
+    def _create_client(
+        self, remake: bool = False, defaults: dict = DEFAULT_BIGQUERY_CONFIG
+    ):
+        if self.client is None or remake:
             logging.debug("Initialising BigQuery client")
             self.client = bigquery.Client(
                 project=defaults.get("project"),
