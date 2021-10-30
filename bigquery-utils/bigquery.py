@@ -33,6 +33,11 @@ class BigQueryClient:
         deleted. However, the process it not atomic; if a dataset has been
         created, or a table or view copied, they will remain in BigQuery.
 
+        This should be updated to take advantage of BigQuery's multi-statement
+        transactions as documented here:
+        https://cloud.google.com/bigquery/docs/reference/standard-sql/transactions
+        It currently doesn't support DML statements, but that may change.
+
         Parameters
         ----------
         target: bigquery.TableReference
@@ -47,12 +52,13 @@ class BigQueryClient:
             default: False
         """
 
-        # TODO: make this entire thing a single transaction
-        # make archive dataset if not exists
+        logging.debug("Running BigQuery archive function")
+
+        # create archive dataset
         try:
             logging.debug(f"Attempting to create archive dataset {destination}")
             self.client.create_dataset(destination)
-            logging.debug(f"Successfully created archive dataset {destination}")
+            logging.info(f"Successfully created archive dataset {destination}")
         except exceptions.Conflict:
             logging.debug(f"Dataset {destination} already exists")
 
