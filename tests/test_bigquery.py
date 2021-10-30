@@ -1,6 +1,6 @@
 from google.cloud import bigquery
 from bigquery_utils import bigquery_client
-from unittest.mock import MagicMock, PropertyMock
+from unittest.mock import MagicMock
 
 bigquery.TableReference = MagicMock()
 bigquery.DatasetReference = MagicMock()
