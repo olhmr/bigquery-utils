@@ -12,7 +12,7 @@ def test_class_creation():
     assert type(bq) == bigquery_client.BigQueryClient
 
     # Check list of implemented methods
-    assert all(method in dir(bq) for method in ["_get_client", "archive"])
+    assert all(method in dir(bq) for method in ["_create_client", "archive"])
 
 
 bq.client.create_dataset = MagicMock()
