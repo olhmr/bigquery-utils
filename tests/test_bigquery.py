@@ -20,5 +20,9 @@ def test_archive():
     bq.client.create_dataset = MagicMock()
     bq.client.copy_table = MagicMock()
     bq.client.delete_table = MagicMock()
+
     bq.archive(target=MagicMock(), destination=MagicMock())
-    assert bq.client.create_dataset.mock_calls
+
+    assert bq.client.create_dataset.called
+    assert bq.client.copy_table.called
+    assert bq.client.delete_table.called
