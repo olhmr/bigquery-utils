@@ -1,15 +1,9 @@
 from bigquery_utils.config import DEFAULT_BIGQUERY_CONFIG
+from bigquery_utils.utils import Response
 from google.cloud import bigquery
 from google.cloud import exceptions
 import logging
 import dataclasses
-
-
-@dataclasses.dataclass
-class Response:
-    name: str
-    code: int
-    additional: any = None
 
 
 @dataclasses.dataclass
