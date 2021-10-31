@@ -9,20 +9,47 @@ import logging
 # TODO: add exception handling
 # TODO: add tests
 
-
 if __name__ == "__main__":
-    logging.debug("Creating parsers")
-    parser = argparse.ArgumentParser(description="BigQuery Utility Functions")
+    parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest="command")
+
+    # log level options
+    parser.add_argument(
+        "--debug",
+        "-d",
+        help="Set log level to DEBUG",
+        action="store_const",
+        dest="log_level",
+        const=logging.DEBUG,
+        default=logging.WARNING,
+    )
+    parser.add_argument(
+        "--verbose",
+        "-v",
+        help="Set log level to INFO",
+        action="store_const",
+        dest="log_level",
+        const=logging.INFO,
+    )
 
     # archive functionality
     archive = subparsers.add_parser("archive")
     archive.add_argument("target", help="Table to archive", type=str, action="store")
     archive.add_argument(
-        "destination", help="Dataset to archive to", type=str, action="store"
+        "destination",
+        help="Dataset to archive to",
+        nargs="?",
+        type=str,
+        default=None,
+        action="store",
     )
     archive.add_argument(
-        "location", help="Location to run job in", nargs="?", type=str, action="store"
+        "location",
+        help="Location to run job in",
+        nargs="?",
+        type=str,
+        default=None,
+        action="store",
     )
     archive.add_argument(
         "overwrite",
@@ -33,8 +60,11 @@ if __name__ == "__main__":
         action="store",
     )
 
-    logging.debug("Parsing arguments")
+    # parse arguments
     args = parser.parse_args()
+
+    # set logging
+    logging.basicConfig(level=args.log_level)
 
     if args.command == "archive":
         logging.debug("Parsing archive command")
