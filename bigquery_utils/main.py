@@ -69,11 +69,15 @@ if __name__ == "__main__":
     if args.command == "archive":
         logging.debug("Parsing archive command")
         target = parse_bigquery_reference(ref_type="table", ref=args.target)
-        destination = parse_bigquery_reference(ref_type="dataset", ref=args.destination)
-        if "location" in args:
-            location = args.location
-        if "overwrite" in args:
-            overwrite = args.overwrite
+        try:
+            destination = parse_bigquery_reference(
+                ref_type="dataset", ref=args.destination
+            )
+        except TypeError:
+            logging.debug("No valid destination found, using default instead")
+            destination = args.destination
+        location = args.location
+        overwrite = args.overwrite
 
         logging.debug("Running archive command")
         bq = bigquery_client.BigQueryClient()

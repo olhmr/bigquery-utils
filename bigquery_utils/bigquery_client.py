@@ -38,7 +38,7 @@ class BigQueryClient:
     def archive(
         self,
         target: bigquery.TableReference,
-        destination: bigquery.DatasetReference,
+        destination: bigquery.DatasetReference = None,
         location: str = None,
         overwrite: bool = False,
     ) -> BigQueryClientResponse:
@@ -63,8 +63,9 @@ class BigQueryClient:
         ----------
         target: bigquery.TableReference
             the table or view to be archived
-        destination: bigquery.DatasetReference
+        destination: bigquery.DatasetReference, optional
             the dataset in which to store the archived table or view
+            default: dataset named `archive` in same project as target
         location: str, optional
             where to run the job
             default: picked up from config
@@ -82,6 +83,9 @@ class BigQueryClient:
 
         # create archive dataset
         try:
+            if destination is None:
+                logging.debug("No destination provided, using default")
+                destination = bigquery.DatasetReference(target.project, "archive")
             logging.debug(f"Attempting to create archive dataset {destination}")
             self.client.create_dataset(destination)
             logging.info(f"Successfully created archive dataset {destination}")
