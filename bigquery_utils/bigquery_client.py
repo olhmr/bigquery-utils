@@ -25,12 +25,12 @@ class BigQueryClientResponse:
 
 
 class BigQueryClient:
-    def __init__(self):
+    def __init__(self) -> None:
         self.client = None
 
     def _create_client(
         self, remake: bool = False, defaults: dict = DEFAULT_BIGQUERY_CONFIG
-    ):
+    ) -> None:
         if self.client is None or remake:
             logging.debug("Initialising BigQuery client")
             self.client = bigquery.Client(
