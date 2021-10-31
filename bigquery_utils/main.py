@@ -11,7 +11,6 @@ import logging
 # TODO: add exception handling
 # TODO: move utility functions to separate file
 # TODO: add tests
-# TODO: add logging
 
 
 def standardise_bigquery_ref(ref: str) -> str:
@@ -40,6 +39,7 @@ def parse_bigquery_reference(
 
 
 if __name__ == "__main__":
+    logging.debug("Creating parsers")
     parser = argparse.ArgumentParser(description="BigQuery Utility Functions")
     subparsers = parser.add_subparsers(dest="command")
 
@@ -61,9 +61,11 @@ if __name__ == "__main__":
         action="store",
     )
 
+    logging.debug("Parsing arguments")
     args = parser.parse_args()
 
     if args.command == "archive":
+        logging.debug("Parsing archive command")
         target = parse_bigquery_reference(ref_type="table", ref=args.target)
         destination = parse_bigquery_reference(ref_type="dataset", ref=args.destination)
         if "location" in args:
@@ -71,6 +73,7 @@ if __name__ == "__main__":
         if "overwrite" in args:
             overwrite = args.overwrite
 
+        logging.debug("Running archive command")
         bq = bigquery_client.BigQueryClient()
         try:
             res = bq.archive(
