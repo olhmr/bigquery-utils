@@ -72,9 +72,18 @@ if __name__ == "__main__":
             overwrite = args.overwrite
 
         bq = bigquery_client.BigQueryClient()
-        bq.archive(
-            target=target,
-            destination=destination,
-            location=location,
-            overwrite=overwrite,
-        )
+        try:
+            res = bq.archive(
+                target=target,
+                destination=destination,
+                location=location,
+                overwrite=overwrite,
+            )
+            if res.code == 0:
+                print(f"Archived {target} in {destination} successfully")
+            else:
+                print(
+                    f"Error encounterd while archiving: {[step for step in res.steps if step.code != 0]}"
+                )
+        except Exception as err:
+            print(f"Unexpected error: {err}")

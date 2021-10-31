@@ -2,6 +2,26 @@ from bigquery_utils.config import DEFAULT_BIGQUERY_CONFIG
 from google.cloud import bigquery
 from google.cloud import exceptions
 import logging
+import dataclasses
+
+
+@dataclasses.dataclass
+class Response:
+    name: str
+    code: int
+    additional: any = None
+
+
+@dataclasses.dataclass
+class BigQueryClientResponse:
+    code: int = 0
+    response: Response = None
+    steps: [Response] = dataclasses.field(default_factory=list)
+
+    def add_step(self, step: Response) -> None:
+        if step.code != 0:
+            self.code = 1
+        self.steps.append(step)
 
 
 class BigQueryClient:
@@ -27,7 +47,7 @@ class BigQueryClient:
         destination: bigquery.DatasetReference,
         location: str = None,
         overwrite: bool = False,
-    ):
+    ) -> BigQueryClientResponse:
         """
         Archive a table or view
 
@@ -61,6 +81,8 @@ class BigQueryClient:
 
         logging.debug("Running BigQuery archive function")
 
+        res = BigQueryClientResponse()
+
         # ensure client is created
         self._create_client()
 
@@ -69,8 +91,10 @@ class BigQueryClient:
             logging.debug(f"Attempting to create archive dataset {destination}")
             self.client.create_dataset(destination)
             logging.info(f"Successfully created archive dataset {destination}")
+            res.add_step(Response("dataset", 0))
         except exceptions.Conflict:
             logging.debug(f"Dataset {destination} already exists")
+            res.add_step(Response("dataset", 0, "Dataset already exists"))
 
         # copy table reference
         logging.debug("Creating copy job")
@@ -86,6 +110,11 @@ class BigQueryClient:
 
         if job.done and not job.errors:
             logging.debug(f"Copy completed, deleting {target}")
+            res.add_step(Response("copy", 0))
             self.client.delete_table(target)
+            res.add_step(Response("delete", 0))
         else:
             logging.debug(f"Errors in copy: {job.errors}")
+            res.add_step(Response("copy", 1, job.errors))
+
+        return res
