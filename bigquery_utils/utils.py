@@ -12,8 +12,8 @@ class Response:
 
 
 def standardise_bigquery_ref(ref: str) -> str:
-    if re.match("^[A-Za-z0-9-]:", ref):
-        ref = re.sub("^[A-Za-z0-9-](:)", ".", ref)
+    if re.search(r"^[A-Za-z0-9-]+:", ref):
+        ref = re.sub(r"(^[A-Za-z0-9-]+)(:)", r"\1.", ref)
     return ref
 
 
