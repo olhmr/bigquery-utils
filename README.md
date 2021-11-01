@@ -29,4 +29,3 @@ It currently does not support archiving views.
 - add exception handling
 - add tests
 - add support for views
-- fix message for default destination

@@ -83,7 +83,7 @@ if __name__ == "__main__":
                 overwrite=overwrite,
             )
             if res.code == 0:
-                print(f"Archived {target} in {destination} successfully")
+                print(f"Archived {res.target} in {res.destination} successfully")
             else:
                 print(
                     f"Error encounterd while archiving: {[step for step in res.steps if step.code != 0]}"

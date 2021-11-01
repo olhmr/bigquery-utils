@@ -11,6 +11,8 @@ class BigQueryClientResponse:
     code: int = 0
     response: Response = None
     steps: [Response] = dataclasses.field(default_factory=list)
+    target: str = None
+    destination: str = None
 
     def add_step(self, step: Response) -> None:
         if step.code != 0:
@@ -90,12 +92,14 @@ class BigQueryClient:
             self.client.create_dataset(destination)
             logging.info(f"Successfully created archive dataset {destination}")
             res.add_step(Response("dataset", 0))
+            res.destination = destination
         except exceptions.Conflict:
             logging.debug(f"Dataset {destination} already exists")
             res.add_step(Response("dataset", 0, "Dataset already exists"))
 
         # copy table reference
         logging.debug("Creating copy job")
+        res.target = target
         job_config = bigquery.CopyJobConfig(
             write_disposition="WRITE_TRUNCATE" if overwrite else "WRITE_EMPTY"
         )
