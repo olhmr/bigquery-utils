@@ -3,12 +3,6 @@ import argparse
 from bigquery_utils import bigquery_client
 import logging
 
-# TODO: add function for iterating through a list of tables in a dataset
-# TODO: add generic validation function for project, dataset, and table ids
-# TODO: add confirmation dialogue
-# TODO: add exception handling
-# TODO: add tests
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest="command")
