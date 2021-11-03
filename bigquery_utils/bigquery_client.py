@@ -101,35 +101,48 @@ class BigQueryClient:
             logging.debug(f"Dataset {destination} already exists")
             res.add_step(Response("dataset", 0, "Dataset already exists"))
 
-        # copy table reference
-        logging.debug("Creating copy job")
+        # copy table / view
         res.target = target
-        job_config = bigquery.CopyJobConfig(
-            write_disposition="WRITE_TRUNCATE" if overwrite else "WRITE_EMPTY"
-        )
-        job = self.client.copy_table(
-            target,
-            bigquery.TableReference(destination, target.table_id),
-            location=location if location else None,
-            job_config=job_config,
-        )
+        tab = self.client.get_table(target)
+        if tab.table_type == "TABLE":
+            logging.debug("Creating copy job for table")
+            job_config = bigquery.CopyJobConfig(
+                write_disposition="WRITE_TRUNCATE" if overwrite else "WRITE_EMPTY"
+            )
+            job = self.client.copy_table(
+                target,
+                bigquery.TableReference(destination, target.table_id),
+                location=location if location else None,
+                job_config=job_config,
+            )
 
-        if job.done and not job.errors:
-            logging.debug("Copy completed")
+            if job.done and not job.errors:
+                logging.debug("Copy of table completed")
+                res.add_step(Response("copy", 0))
+            else:
+                logging.debug(f"Errors in copy: {job.errors}")
+                res.add_step(Response("copy", 1, job.errors))
+        elif tab.table_type == "VIEW":
+            logging.debug("Creating copy of view")
+            view = bigquery.Table(bigquery.TableReference(destination, target.table_id))
+            view.view_query = tab.view_query
+            view = self.client.create_table(view)
+            logging.debug("Copy of view completed")
             res.add_step(Response("copy", 0))
-            if confirmation:
-                confirm = input(f"Confirm deletion of {target} y/n: ")
-            else:
-                confirm = "y"
-            if confirm.lower() in ["y", "yes"]:
-                logging.debug(f"Deleting {target}")
-                self.client.delete_table(target)
-                res.add_step(Response("delete", 0))
-            else:
-                logging.debug("Aborting deletion due to user input")
-                res.add_step(Response("delete", 1))
         else:
-            logging.debug(f"Errors in copy: {job.errors}")
-            res.add_step(Response("copy", 1, job.errors))
+            raise ValueError(f"Unsupported table type: {tab.table_type}")
+
+        if confirmation:
+            confirm = input(f"Copy complete. Confirm deletion of {target} y/n: ")
+        else:
+            confirm = "y"
+
+        if confirm.lower() in ["y", "yes"]:
+            logging.debug(f"Deleting {target}")
+            self.client.delete_table(target)
+            res.add_step(Response("delete", 0))
+        else:
+            logging.debug("Aborting deletion due to user input")
+            res.add_step(Response("delete", 1))
 
         return res
