@@ -24,7 +24,6 @@ It currently does not support archiving views.
 
 # To-do
 - add function for iterating through a list of tables in a dataset
-- add generic validation function for project, dataset, and table ids
 - add confirmation dialogue
 - add exception handling
 - add tests
