@@ -22,5 +22,5 @@ If copying fails, the `target` is not deleted. Additionally, input is required t
 
 # To-do
 - add function for iterating through a list of tables in a dataset
-- add exception handling
-- add tests
+- add better exception handling
+- add more tests
