@@ -86,7 +86,7 @@ if __name__ == "__main__":
                 print(f"Archived {res.target} in {res.destination} successfully")
             else:
                 print(
-                    f"Error encounterd while archiving: {[step for step in res.steps if step.code != 0]}"
+                    f"Error encountered while archiving: {[step for step in res.steps if step.code != 0]}"
                 )
         except Exception as err:
             print(f"Unexpected error: {err}")
