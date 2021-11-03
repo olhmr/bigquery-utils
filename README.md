@@ -26,4 +26,3 @@ It currently does not support archiving views.
 - add function for iterating through a list of tables in a dataset
 - add exception handling
 - add tests
-- add support for views
