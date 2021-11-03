@@ -23,7 +23,7 @@ bq.client.delete_table = MagicMock()
 def test_archive_happy_path():
     bq.client.copy_table.return_value.done = True
     bq.client.copy_table.return_value.errors = False
-    res = bq.archive(target=MagicMock(), destination=MagicMock())
+    res = bq.archive(target=MagicMock(), destination=MagicMock(), confirmation=False)
 
     assert bq.client.create_dataset.called
     assert bq.client.copy_table.called
@@ -36,7 +36,7 @@ def test_archive_happy_path():
 def test_archive_error_in_copy():
     bq.client.copy_table.return_value.done = True
     bq.client.copy_table.return_value.errors = True
-    res = bq.archive(target=MagicMock(), destination=MagicMock())
+    res = bq.archive(target=MagicMock(), destination=MagicMock(), confirmation=False)
 
     assert bq.client.create_dataset.called
     assert bq.client.copy_table.called
@@ -48,7 +48,7 @@ def test_archive_error_in_copy():
 def test_archive_copy_never_finishes():
     bq.client.copy_table.return_value.done = False
     bq.client.copy_table.return_value.errors = False
-    res = bq.archive(target=MagicMock(), destination=MagicMock())
+    res = bq.archive(target=MagicMock(), destination=MagicMock(), confirmation=False)
 
     assert bq.client.create_dataset.called
     assert bq.client.copy_table.called
@@ -60,7 +60,7 @@ def test_archive_copy_never_finishes():
 def test_archive_copy_never_finishes_but_error():
     bq.client.copy_table.return_value.done = False
     bq.client.copy_table.return_value.errors = True
-    res = bq.archive(target=MagicMock(), destination=MagicMock())
+    res = bq.archive(target=MagicMock(), destination=MagicMock(), confirmation=False)
 
     assert bq.client.create_dataset.called
     assert bq.client.copy_table.called

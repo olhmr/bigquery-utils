@@ -43,6 +43,7 @@ class BigQueryClient:
         destination: bigquery.DatasetReference = None,
         location: str = None,
         overwrite: bool = False,
+        confirmation: bool = True
     ) -> BigQueryClientResponse:
         """
         Archive a table or view
@@ -74,6 +75,9 @@ class BigQueryClient:
         overwrite: bool, optional
             should existing tables and views in the destination be overridden
             default: False
+        confirmation: bool, optional
+            should confirmation be required before deletion
+            default: True
         """
 
         logging.debug("Running BigQuery archive function")
@@ -111,10 +115,19 @@ class BigQueryClient:
         )
 
         if job.done and not job.errors:
-            logging.debug(f"Copy completed, deleting {target}")
+            logging.debug(f"Copy completed")
             res.add_step(Response("copy", 0))
-            self.client.delete_table(target)
-            res.add_step(Response("delete", 0))
+            if confirmation:
+                confirm = input(f"Confirm deletion of {target} y/n: ")
+            else:
+                confirm = "y"
+            if confirm.lower() in ["y", "yes"]:
+                logging.debug(f"Deleting {target}")
+                self.client.delete_table(target)
+                res.add_step(Response("delete", 0))
+            else:
+                logging.debug(f"Aborting deletion due to user input")
+                res.add_step(Response("delete", 1))
         else:
             logging.debug(f"Errors in copy: {job.errors}")
             res.add_step(Response("copy", 1, job.errors))
