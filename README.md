@@ -18,9 +18,8 @@ The archive command requires at a minimum a `target` subcommand. It will do thre
 2. Copy the `target` to the same name in the `archive` dataset.
 3. Delete the `target`
 
-If copying fails, the `target` is not deleted.
-
 It currently does not support archiving views.
+If copying fails, the `target` is not deleted. Additionally, input is required to confirm deletion before it happens.
 
 # To-do
 - add function for iterating through a list of tables in a dataset
