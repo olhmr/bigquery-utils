@@ -11,8 +11,8 @@ class BigQueryClientResponse:
     code: int = 0
     response: Response = None
     steps: [Response] = dataclasses.field(default_factory=list)
-    target: str = None
-    destination: str = None
+    target: bigquery.TableReference = None
+    destination: bigquery.DatasetReference = None
 
     def add_step(self, step: Response) -> None:
         if step.code != 0:
