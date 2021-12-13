@@ -92,11 +92,11 @@ class BigQueryClient:
             if destination is None:
                 logging.debug("No destination provided, using default")
                 destination = bigquery.DatasetReference(target.project, "archive")
+            res.destination = destination
             logging.debug(f"Attempting to create archive dataset {destination}")
             self.client.create_dataset(destination)
             logging.info(f"Successfully created archive dataset {destination}")
             res.add_step(Response("dataset", 0))
-            res.destination = destination
         except exceptions.Conflict:
             logging.debug(f"Dataset {destination} already exists")
             res.add_step(Response("dataset", 0, "Dataset already exists"))
