@@ -24,3 +24,7 @@ If copying fails, the `target` is not deleted. Additionally, input is required t
 - add function for iterating through a list of tables in a dataset
 - add better exception handling
 - add more tests
+- create options for handling situations where archive already exists
+  - shard the archive using date suffix
+  - replace the existing archive
+  - skip copy and just delete
