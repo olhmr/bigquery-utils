@@ -122,6 +122,7 @@ class BigQueryClient:
             else:
                 logging.debug(f"Errors in copy: {job.errors}")
                 res.add_step(Response("copy", 1, job.errors))
+                raise RuntimeError(f"Errors in copy: {job.errors}")
         elif tab.table_type == "VIEW":
             logging.debug("Creating copy of view")
             view = bigquery.Table(bigquery.TableReference(destination, target.table_id))
