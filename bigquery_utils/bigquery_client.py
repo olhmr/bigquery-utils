@@ -147,3 +147,44 @@ class BigQueryClient:
             res.add_step(Response("delete", 1))
 
         return res
+
+    def dbdiagram_export(
+        self, target: bigquery.TableReference
+    ) -> BigQueryClientResponse:
+        """
+        Export a dbdiagram description of a table or view
+
+        TODO: add option to save to file
+        """
+
+        # ensure client is created
+        self._create_client()
+
+        res = BigQueryClientResponse()
+
+        tab = self.client.get_table(target)
+        schema = tab.schema
+
+        output = f"Table {tab.table_id}" + " {\n"
+        for field in schema:
+            # the output uses " for string quoting, so we need to replace any
+            # occurrences within the description string with '
+            try:
+                clean_description = field.description.replace('"', "'")
+            except AttributeError:
+                clean_description = "No description"
+            output = (
+                output
+                + "  "
+                + field.name
+                + " "
+                + field.field_type
+                + " "
+                + f'[note: "{clean_description}"]'
+                + "\n"
+            )
+        output = output + "}"
+
+        res.response = Response(name="dbdiagram export", code=0, additional=output)
+
+        return res

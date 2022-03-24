@@ -54,6 +54,12 @@ if __name__ == "__main__":
         action="store",
     )
 
+    # db diagram export functionality
+    dbdiagram = subparsers.add_parser("dbdiagram")
+    dbdiagram.add_argument(
+        "target", help="Table or view to export", type=str, action="store"
+    )
+
     # parse arguments
     args = parser.parse_args()
 
@@ -90,5 +96,16 @@ if __name__ == "__main__":
                 print(
                     f"Error encountered while archiving: {[step for step in res.steps if step.code != 0]}"
                 )
+        except Exception as err:
+            print(f"Unexpected error: {err}")
+    elif args.command == "dbdiagram":
+        logging.debug("Parsing dbdiagram command")
+        target = parse_bigquery_reference(ref_type="table", ref=args.target)
+        logging.debug("Running dbdiagram export command")
+        bq = bigquery_client.BigQueryClient()
+        try:
+            res = bq.dbdiagram_export(target=target)
+            if res.code == 0:
+                print(res.response.additional)
         except Exception as err:
             print(f"Unexpected error: {err}")
